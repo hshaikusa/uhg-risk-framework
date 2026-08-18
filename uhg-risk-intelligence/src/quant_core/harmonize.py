@@ -19,8 +19,7 @@ import pandas as pd
 # from the original framework's fitted values. They have NOT been recalibrated
 # against CMS rate-notice history or state-ranking history, because that
 # history doesn't exist yet for this proof-of-concept. Treat these as
-# reasonable *starting* constants, not validated ones — this is one of the
-# limitations named explicitly in the interview narrative doc.
+# reasonable *starting* constants, not validated ones.
 SP_LOG_BASE = 2.2
 RANK_TAIL_GAMMA = 1.15
 MOMENTUM_SCALE = 5  # points added/subtracted per +1/-1 outlook
