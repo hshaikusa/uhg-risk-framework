@@ -22,8 +22,7 @@ from src.schemas import OverlayEvent, ScenarioQuery, Segment
 # Confidence floor: a defended, tunable parameter with a conservative
 # default. If asked "why this number," the honest answer is that it's a
 # documented tradeoff (favor refusing a recommendation over surfacing a
-# shaky one), not a law of nature — see fde-interview-narrative.docx section
-# on the guardrail gate for the full defense.
+# shaky one), not a law of nature.
 CONFIDENCE_FLOOR = 0.5
 
 # Segments that no longer exist (e.g. divested units). The query parser can
