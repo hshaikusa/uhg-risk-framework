@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "yfmcp": {
+      "command": "uvx",
+      "args": ["yfmcp"],
+      "optional": true
+    }
+  }
+}

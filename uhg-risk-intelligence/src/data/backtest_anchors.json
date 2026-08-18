@@ -1,0 +1,25 @@
+{
+  "_provenance": "These two entries are REAL, PUBLIC, disclosed events — not synthetic. Sourced from UHG's own earnings releases/SEC filings and public reporting. They are the validation roadmap's anchor points (see fde-interview-narrative.docx Section 10).",
+  "anchors": [
+    {
+      "id": "optum_health_2025_ma_rate_impact",
+      "segment": "Optum_Health",
+      "disruptor": "D6_political_regulatory_volatility",
+      "driver": "Capital",
+      "description": "Optum Health FY2025 operating earnings swung from $7.8B (FY2024) to a $278M loss, attributed by UHG to Medicare funding reductions and utilization pressure.",
+      "disclosed_in": "UnitedHealth Group FY2025 earnings release / 10-K",
+      "backtest_question": "Would the framework's Capital/Demand driver baseline for Optum Health have shown elevated risk in early 2025, ahead of this disclosed outcome?",
+      "status": "not_yet_run"
+    },
+    {
+      "id": "optum_insight_2024_change_healthcare_cyberattack",
+      "segment": "Optum_Insight",
+      "disruptor": "D3_tech_data_divergence",
+      "driver": "Data_Digital",
+      "description": "A February 2024 cyberattack on Change Healthcare (an Optum Insight subsidiary) caused a significant, disclosed operational and financial impact.",
+      "disclosed_in": "UnitedHealth Group public disclosures and earnings commentary, 2024",
+      "backtest_question": "Would the framework's Data_Digital driver baseline for Optum Insight have shown elevated risk ahead of this event, and would an overlay-extraction pass on early reporting have flagged it promptly?",
+      "status": "not_yet_run"
+    }
+  ]
+}

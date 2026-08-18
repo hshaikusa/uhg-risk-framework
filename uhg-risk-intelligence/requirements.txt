@@ -1,0 +1,35 @@
+# Deterministic quant core — no LLM framework needed here at all
+pandas>=2.2
+numpy>=1.26
+
+# Data contracts
+pydantic>=2.6
+
+# LLM steps: structured output via instructor, direct provider SDKs
+instructor>=1.3
+openai>=1.30
+# anthropic>=0.28          # uncomment if using Claude instead of/alongside OpenAI
+
+# Orchestration — used ONLY for the graph wiring and the human-in-the-loop
+# interrupt on overlay confirmation, not for the LLM calls themselves
+langgraph>=0.2
+
+# Search tool for the overlay extractor (optional — falls back to bundled
+# sample data in src/data/sample_overlay_texts.json if not installed/configured)
+tavily-python>=0.5
+
+# Observability/evals (pick one — see README "Evals and observability")
+langsmith>=0.1             # free tier; integrates natively with LangGraph
+# arize-phoenix>=4.0        # alternative: fully open source, self-hosted, no account needed
+
+# Demo UI (optional)
+streamlit>=1.35
+
+# Demo / config
+python-dotenv>=1.0
+
+# Testing
+pytest>=8.0
+
+# Optional MCP client — supplemental tools from demo.py (see mcp_servers.json.example)
+mcp>=1.8

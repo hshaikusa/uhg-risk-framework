@@ -1,0 +1,17 @@
+{
+  "_provenance": "Short, illustrative summaries written for this demo based on the real, public events named in backtest_anchors.json. These are NOT verbatim quotations from any news source or filing (see copyright handling in README) — they're paraphrased summaries sized for a demo, used as the bundled fallback input to the overlay extractor when live search (Tavily) is unavailable or for reproducible offline runs.",
+  "samples": [
+    {
+      "id": "sample_ma_rate_notice",
+      "segment": "Optum_Health",
+      "driver": "Capital",
+      "text": "CMS finalized lower-than-expected Medicare Advantage reimbursement rate updates for the coming plan year, citing revised risk-adjustment methodology. Analysts noted the change would pressure margins for MA-exposed care-delivery and insurance segments industry-wide."
+    },
+    {
+      "id": "sample_cyber_incident",
+      "segment": "Optum_Insight",
+      "driver": "Data_Digital",
+      "text": "A major healthcare technology and claims-processing subsidiary disclosed a significant cybersecurity incident affecting prescription processing and claims payment systems across the industry, prompting emergency operational workarounds and regulatory attention to health-data security practices."
+    }
+  ]
+}
