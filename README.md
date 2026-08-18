@@ -3,7 +3,8 @@
 A designed-but-unvalidated proof of concept adapting a multi-source
 geopolitical risk intelligence framework to UnitedHealth Group. Full design
 rationale, pressure-test findings, and covers the code specifically:
-what's real, what's synthetic, what needs API keys, and how to run it.
+what's real, what's synthetic, what needs API keys,tools, mcp, evals, observability,
+guard rails, web search using Tavily and how to run it.
 
 ## Quick start
 
