@@ -2,8 +2,7 @@
 
 A designed-but-unvalidated proof of concept adapting a multi-source
 geopolitical risk intelligence framework to UnitedHealth Group. Full design
-rationale, pressure-test findings, and the STAR interview narrative live in
-`fde-interview-narrative.docx` — this README covers the code specifically:
+rationale, pressure-test findings, and covers the code specifically:
 what's real, what's synthetic, what needs API keys, and how to run it.
 
 ## Quick start
@@ -120,10 +119,9 @@ running two observability stacks for a proof of concept):
   you tracing and eval datasets with the least setup.
 - **Arize Phoenix** — fully open source, self-hosted, no account or API key
   needed at all (`pip install arize-phoenix`, run locally). Better fit if
-  you want a "no external dependency" story for the interview.
+  you want a "no external dependency".
 
-Eval sets to build (not yet populated — see `fde-interview-narrative.docx`
-Section 10 for the full validation roadmap):
+Eval sets to build (not yet populated:
 - Query-parser accuracy: labeled NL questions → expected `ScenarioQuery`
 - Overlay-extraction calibration: double-rated ground truth (two independent
   raters per event — single-label grading is too strict for an inherently
@@ -148,10 +146,3 @@ docs/
   langgraph_flow.md         # LangGraph node/edge diagram from src/graph.py
   project_flow.md           # Full project flow (CLI, overlay, MCP, observability)
 ```
-
-## Known limitations
-
-See `fde-interview-narrative.docx` Section 6 for the full, deliberately-named
-list (data sourcing, low-N weighting, the Community & State scoping decision,
-etc.) — this code implements that section's design decisions directly rather
-than restating them here.
