@@ -1,0 +1,359 @@
+{
+  "generated_at": "2026-08-28T22:22:12.828434+00:00",
+  "mode": "watch_latest_run",
+  "project": "uhg-risk-intelligence",
+  "span_count": 200,
+  "new_span_ids": 10,
+  "newest": {
+    "name": "ChatCompletion",
+    "start_time": "2026-08-28 22:22:00.853354+00:00",
+    "span_id": "f3eac04d8f2e58bb"
+  },
+  "latest_run": {
+    "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+    "start_time": "2026-08-28 22:22:00.441621+00:00",
+    "anchor_span": "generate_narrative",
+    "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+    "segment": null,
+    "audience": "analyst",
+    "recommended_pathway": null,
+    "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+    "span_names": [
+      "ChatCompletion",
+      "LangGraph",
+      "check_access",
+      "compute_baseline",
+      "generate_narrative",
+      "parse_query",
+      "route_after_access",
+      "route_after_parse",
+      "run_scenario"
+    ],
+    "span_count": 10,
+    "kinds": [
+      "CHAIN",
+      "LLM"
+    ]
+  },
+  "suite": {
+    "name": "trace_evals_latest_run",
+    "passed": 7,
+    "total": 7,
+    "pass_rate": 1.0,
+    "mean_score": 1.0,
+    "results": [
+      {
+        "suite": "trace_evals_latest_run",
+        "case_id": "run_path",
+        "passed": true,
+        "score": 1.0,
+        "detail": {
+          "passed": true,
+          "score": 1.0,
+          "path": "full_success",
+          "detail": "happy-path query should reach narrative",
+          "present": [
+            "parse_query",
+            "check_access",
+            "compute_baseline",
+            "run_scenario",
+            "generate_narrative"
+          ],
+          "expected": [
+            "parse_query",
+            "check_access",
+            "compute_baseline",
+            "run_scenario",
+            "generate_narrative"
+          ],
+          "classification": {
+            "path": "full_success",
+            "names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "clarified": false,
+            "denied": false,
+            "full": true,
+            "clarify_route": false,
+            "active_parse_failure": false,
+            "in_flight": false
+          },
+          "latest_run": {
+            "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+            "start_time": "2026-08-28 22:22:00.441621+00:00",
+            "anchor_span": "generate_narrative",
+            "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+            "segment": null,
+            "audience": "analyst",
+            "recommended_pathway": null,
+            "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+            "span_names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "span_count": 10,
+            "kinds": [
+              "CHAIN",
+              "LLM"
+            ]
+          }
+        },
+        "error": null
+      },
+      {
+        "suite": "trace_evals_latest_run",
+        "case_id": "run_kinds",
+        "passed": true,
+        "score": 1.0,
+        "detail": {
+          "passed": true,
+          "score": 1.0,
+          "counts": {
+            "CHAIN": 8,
+            "LLM": 2
+          },
+          "hard_missing": [],
+          "path": "full_success",
+          "latest_run": {
+            "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+            "start_time": "2026-08-28 22:22:00.441621+00:00",
+            "anchor_span": "generate_narrative",
+            "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+            "segment": null,
+            "audience": "analyst",
+            "recommended_pathway": null,
+            "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+            "span_names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "span_count": 10,
+            "kinds": [
+              "CHAIN",
+              "LLM"
+            ]
+          }
+        },
+        "error": null
+      },
+      {
+        "suite": "trace_evals_latest_run",
+        "case_id": "run_error_rate",
+        "passed": true,
+        "score": 1.0,
+        "detail": {
+          "passed": true,
+          "score": 1.0,
+          "error_rate": 0.0,
+          "errors": 0,
+          "total": 10,
+          "latest_run": {
+            "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+            "start_time": "2026-08-28 22:22:00.441621+00:00",
+            "anchor_span": "generate_narrative",
+            "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+            "segment": null,
+            "audience": "analyst",
+            "recommended_pathway": null,
+            "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+            "span_names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "span_count": 10,
+            "kinds": [
+              "CHAIN",
+              "LLM"
+            ]
+          }
+        },
+        "error": null
+      },
+      {
+        "suite": "trace_evals_latest_run",
+        "case_id": "run_guardrail_clarify",
+        "passed": true,
+        "score": 1.0,
+        "detail": {
+          "passed": true,
+          "score": 1.0,
+          "skipped": true,
+          "detail": "no parse-failure route spans in window",
+          "latest_run": {
+            "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+            "start_time": "2026-08-28 22:22:00.441621+00:00",
+            "anchor_span": "generate_narrative",
+            "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+            "segment": null,
+            "audience": "analyst",
+            "recommended_pathway": null,
+            "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+            "span_names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "span_count": 10,
+            "kinds": [
+              "CHAIN",
+              "LLM"
+            ]
+          }
+        },
+        "error": null
+      },
+      {
+        "suite": "trace_evals_latest_run",
+        "case_id": "run_narrative_caveat",
+        "passed": true,
+        "score": 1.0,
+        "detail": {
+          "passed": true,
+          "score": 1.0,
+          "skipped": true,
+          "detail": "no low-confidence narrative spans in window",
+          "latest_run": {
+            "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+            "start_time": "2026-08-28 22:22:00.441621+00:00",
+            "anchor_span": "generate_narrative",
+            "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+            "segment": null,
+            "audience": "analyst",
+            "recommended_pathway": null,
+            "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+            "span_names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "span_count": 10,
+            "kinds": [
+              "CHAIN",
+              "LLM"
+            ]
+          }
+        },
+        "error": null
+      },
+      {
+        "suite": "trace_evals_latest_run",
+        "case_id": "run_retriever",
+        "passed": true,
+        "score": 1.0,
+        "detail": {
+          "passed": true,
+          "score": 1.0,
+          "skipped": true,
+          "detail": "no RETRIEVER spans in window",
+          "latest_run": {
+            "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+            "start_time": "2026-08-28 22:22:00.441621+00:00",
+            "anchor_span": "generate_narrative",
+            "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+            "segment": null,
+            "audience": "analyst",
+            "recommended_pathway": null,
+            "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+            "span_names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "span_count": 10,
+            "kinds": [
+              "CHAIN",
+              "LLM"
+            ]
+          }
+        },
+        "error": null
+      },
+      {
+        "suite": "trace_evals_latest_run",
+        "case_id": "run_mcp_tools",
+        "passed": true,
+        "score": 1.0,
+        "detail": {
+          "passed": true,
+          "score": 1.0,
+          "skipped": true,
+          "detail": "no TOOL / mcp.call_tool spans in window",
+          "latest_run": {
+            "trace_id": "dcf0afe80f050aed2ba6686b7e6f05df",
+            "start_time": "2026-08-28 22:22:00.441621+00:00",
+            "anchor_span": "generate_narrative",
+            "question": "How exposed is Optum Rx to pharmacy benefit regulatory changes?",
+            "segment": null,
+            "audience": "analyst",
+            "recommended_pathway": null,
+            "narrative_preview": "audience=<NarrativeAudience.ANALYST: 'analyst'> text='The analysis for Optum_Rx indicates that the primary driver is demand, while the disruptor involves political and regulatory volatility (D6). The final risk is assessed at 71.6, with an opportunity score of 33.2, and the confidence level for this assessment is 0.97. Recommended pathway is to renegotiate risk sharing.' confidence_caveat_shown=False source_scenario=ScenarioOutput(segment=<Segment.OPTUM_RX: 'Optum_Rx'>, disruptor=<Disruptor.D6_POLITICAL_VOLATILITY: 'D6_political_regulatory_volatility'>, driver=<Driver.DEMAND: 'Demand'>, final_risk=71.6, final_opportunity=33.2, recommended_pathway=<Pathway.RENEGOTIATE_RISK_SHARING: 'renegotiate_risk_sharing'>, net_strategic_value=-31.8, confidence=0.97, below_confidence_floor=False)",
+            "span_names": [
+              "ChatCompletion",
+              "LangGraph",
+              "check_access",
+              "compute_baseline",
+              "generate_narrative",
+              "parse_query",
+              "route_after_access",
+              "route_after_parse",
+              "run_scenario"
+            ],
+            "span_count": 10,
+            "kinds": [
+              "CHAIN",
+              "LLM"
+            ]
+          }
+        },
+        "error": null
+      }
+    ]
+  }
+}

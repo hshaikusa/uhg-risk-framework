@@ -1,0 +1,6 @@
+{"id": "in_scope_optum_health", "question": "How exposed is Optum Health to a Medicare Advantage rate cut?", "expect_in_scope": true, "expect_reject_reason": null}
+{"id": "in_scope_change_healthcare", "question": "Would Change Healthcare cyber risk elevate Optum Insight Data_Digital baseline?", "expect_in_scope": true, "expect_reject_reason": null}
+{"id": "out_of_scope_nvidia", "question": "How is NVIDIA stock doing this year?", "expect_in_scope": false, "expect_reject_reason": "out_of_scope"}
+{"id": "out_of_scope_weather", "question": "Will it rain in Chicago tomorrow?", "expect_in_scope": false, "expect_reject_reason": "out_of_scope"}
+{"id": "retired_optum_international", "question": "How exposed is Optum International to political volatility?", "expect_in_scope": true, "expect_reject_reason": "unknown_segment", "segment_for_validate": "Optum_Health"}
+{"id": "retired_optum_global", "question": "What is Optum Global exposure to cyber risk?", "expect_in_scope": true, "expect_reject_reason": "unknown_segment", "segment_for_validate": "Optum_Insight"}
