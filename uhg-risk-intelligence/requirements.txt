@@ -20,7 +20,15 @@ tavily-python>=0.5
 
 # Observability/evals (pick one — see README "Evals and observability")
 langsmith>=0.1             # free tier; integrates natively with LangGraph
-# arize-phoenix>=4.0        # alternative: fully open source, self-hosted, no account needed
+# Phoenix self-hosted (OBSERVABILITY_BACKEND=phoenix). Package name is NOT
+# "OTLPSpanExporter" — install these:
+arize-phoenix>=4.0         # includes phoenix.evals ClassificationEvaluator API
+opentelemetry-sdk>=1.27
+opentelemetry-exporter-otlp-proto-http>=1.27
+openinference-instrumentation-langchain
+openinference-instrumentation-openai
+# openinference-instrumentation-instructor  # optional
+# Native Phoenix evaluators: python -m evals --phoenix-evals (see docs/evals_phoenix_native.md)
 
 # Demo UI (optional)
 streamlit>=1.35

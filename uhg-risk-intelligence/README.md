@@ -2,7 +2,8 @@
 
 A designed-but-unvalidated proof of concept adapting a multi-source
 geopolitical risk intelligence framework to UnitedHealth Group. Full design
-rationale, pressure-test findings, and covers the code specifically:
+rationale, pressure-test findings, and the STAR interview narrative live in
+`fde-interview-narrative.docx` — this README covers the code specifically:
 what's real, what's synthetic, what needs API keys, and how to run it.
 
 ## Quick start
@@ -74,6 +75,7 @@ Three real bugs were caught and fixed during this build, in case it comes up:
 | Query parsing | `FAST_MODEL` (default `gpt-4o-mini`) | Low-ambiguity structured extraction |
 | Narrative generation | `FAST_MODEL` | Templating/rewriting, not judgment |
 | Overlay extraction | `STRONG_MODEL` (default `gpt-4o`) | Genuine judgment call (severity/immediacy/persistence ratings); paired with a mandatory human-confirmation gate regardless of model strength |
+| Eval LLM-as-judge | `JUDGE_MODEL` (default `gpt-4.1-mini`) | Separate grader for narrative/retrieval/overlay quality (`docs/evals_llm_judge.md`) |
 
 Override via `.env` — see `.env.example`.
 
@@ -119,15 +121,37 @@ running two observability stacks for a proof of concept):
   you tracing and eval datasets with the least setup.
 - **Arize Phoenix** — fully open source, self-hosted, no account or API key
   needed at all (`pip install arize-phoenix`, run locally). Better fit if
-  you want a "no external dependency".
+  you want a "no external dependency" story for the interview.
 
-Eval sets to build (not yet populated:
-- Query-parser accuracy: labeled NL questions → expected `ScenarioQuery`
-- Overlay-extraction calibration: double-rated ground truth (two independent
-  raters per event — single-label grading is too strict for an inherently
-  subjective 0-3 scale, per the pressure-test finding in the narrative doc)
-- Core validation backtest: driver baselines vs. the two real anchor events
-  in `data/backtest_anchors.json`
+Eval suites live in `evals/` (see `evals/README.md`):
+
+```powershell
+python -m evals                      # offline fixtures + sample Phoenix spans
+python -m evals --all                # offline + live + Phoenix one-shot (+ judges + phoenix.evals)
+python -m evals --phoenix-only       # online one-shot: score live Phoenix traces
+python -m evals --phoenix-only --phoenix-evals --annotate  # + Arize phoenix.evals on latest run
+python -m evals --watch --interval 10 --annotate   # continuous online as traces arrive
+python -m evals --watch --judge --phoenix-evals --annotate  # custom judges + phoenix.evals
+python -m evals --live               # + live LLM parser/overlay/judge fixtures
+python -m evals --judges-only        # LLM-as-judge suites only
+python -m evals --json-out evals/last_report.json
+pytest tests/test_evals_offline.py tests/test_llm_judge_rules.py tests/test_phoenix_evals_dataframe.py
+```
+
+Covered today:
+- Scope / retired-segment guardrail gate
+- Query-parser exact-match scorer (+ live suite)
+- Overlay double-rater ±1 calibration (+ live suite)
+- Narrative faithfulness + code-enforced caveat
+- Retrieval relevance (keyword heuristic on RETRIEVER-style text)
+- Backtest anchors directional check (`src/data/backtest_anchors.json`)
+- Custom LLM-as-judge suites (`--judges-only` / `--watch --judge`) — see `docs/evals_llm_judge.md`
+- **Arize Phoenix-native evaluators** (`--phoenix-evals`) — see `docs/evals_phoenix_native.md`
+- **Trace-based evals** on OpenInference spans:
+  - offline sample fixture
+  - online one-shot (`--phoenix-only`)
+  - continuous online watcher (`--watch`) that re-scores when new Phoenix traces appear
+    (optional `--annotate` writes CODE/LLM labels back into the Phoenix UI)
 
 ## Project layout
 
@@ -140,9 +164,21 @@ src/
   ai_steps/                 # the three narrow LLM steps + search tool
   data/                     # real backtest anchors + synthetic registry/samples
   graph.py                  # LangGraph wiring — orchestration only, no agentic reasoning
-tests/                      # 21 tests, all runnable without API keys
+tests/                      # unit tests + offline eval gate, no API keys
+evals/                      # fixtures, scorers, offline/live suites (`python -m evals`)
 demo.py                     # CLI entry point, runs with or without a live API key
 docs/
   langgraph_flow.md         # LangGraph node/edge diagram from src/graph.py
   project_flow.md           # Full project flow (CLI, overlay, MCP, observability)
+  evals_live.md             # live parser/overlay fixture suites
+  evals_llm_judge.md        # custom Instructor LLM judges
+  evals_phoenix_native.md   # Arize phoenix.evals ClassificationEvaluators
+  emerging_events_rag_design.md  # RAG plan: S&P/IMD baseline + emerging events
 ```
+
+## Known limitations
+
+See `fde-interview-narrative.docx` Section 6 for the full, deliberately-named
+list (data sourcing, low-N weighting, the Community & State scoping decision,
+etc.) — this code implements that section's design decisions directly rather
+than restating them here.
