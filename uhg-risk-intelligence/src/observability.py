@@ -53,14 +53,24 @@ def _setup_phoenix() -> None:
     global _tracer_provider, _phoenix_project
     os.environ.pop("LANGSMITH_TRACING", None)
 
-    from opentelemetry import trace
-    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-    from opentelemetry.sdk.resources import Resource
-    from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import BatchSpanProcessor
-    from openinference.instrumentation.langchain import LangChainInstrumentor
-    from openinference.instrumentation.openai import OpenAIInstrumentor
-    from openinference.semconv.resource import ResourceAttributes
+    try:
+        from opentelemetry import trace
+        from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+        from opentelemetry.sdk.resources import Resource
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+        from openinference.instrumentation.langchain import LangChainInstrumentor
+        from openinference.instrumentation.openai import OpenAIInstrumentor
+        from openinference.semconv.resource import ResourceAttributes
+    except ImportError as exc:
+        raise ImportError(
+            "Phoenix observability deps missing. Install with:\n"
+            "  python -m pip install opentelemetry-exporter-otlp-proto-http "
+            "opentelemetry-sdk openinference-instrumentation-langchain "
+            "openinference-instrumentation-openai\n"
+            "Or set OBSERVABILITY_BACKEND=none to disable tracing.\n"
+            f"Original error: {exc}"
+        ) from exc
 
     endpoint = _env("PHOENIX_COLLECTOR_ENDPOINT", "http://127.0.0.1:6006/v1/traces")
     project = phoenix_project_name()
