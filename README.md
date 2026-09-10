@@ -2,141 +2,30 @@
 
 A designed-but-unvalidated proof of concept adapting a multi-source
 geopolitical risk intelligence framework to UnitedHealth Group. Full design
-rationale, pressure-test findings, and covers the code specifically:
-what's real, what's synthetic, what needs API keys,tools, mcp, evals, observability,
-guard rails, web search using Tavily and how to run it.
-
-#####################
-
-# LangGraph flow — `src/graph.py`
-
-This diagram matches the **compiled query pipeline** built by `build_graph()` in
-`src/graph.py`. Node names are identical to the LangGraph node IDs (visible in
-Phoenix traces).
-
-Copy into [mermaid.live](https://mermaid.live) or VS Code Mermaid preview.
-
-## Compiled query graph (used by `demo.py query`)
-
-```mermaid
-flowchart TB
-    START([__start__]) --> parse_query
-
-    parse_query["parse_query<br/><b>node_parse_query</b><br/>LLM → ScenarioQuery | ParseFailure<br/>+ validate_query guardrails"]
-
-    parse_query --> route_after_parse{route_after_parse}
-
-    route_after_parse -->|clarify<br/>parse_failure set| END_FAIL([END<br/>fail closed])
-    route_after_parse -->|check_access| check_access
-
-    check_access["check_access<br/><b>node_check_access</b><br/>enforce_access(role, segment)"]
-
-    check_access --> route_after_access{route_after_access}
-
-    route_after_access -->|denied<br/>access_denied=True| END_DENY([END<br/>fail closed])
-    route_after_access -->|compute_baseline| compute_baseline
-
-    compute_baseline["compute_baseline<br/><b>node_compute_baseline</b><br/>deterministic quant core<br/>→ DriverBaseline"]
-
-    compute_baseline --> run_scenario
-
-    run_scenario["run_scenario<br/><b>node_run_scenario</b><br/>scenario engine<br/>→ ScenarioOutput<br/>confidence floor applied"]
-
-    run_scenario --> generate_narrative
-
-    generate_narrative["generate_narrative<br/><b>node_generate_narrative</b><br/>LLM → NarrativeOutput<br/>analyst | executive"]
-
-    generate_narrative --> END_OK([END<br/>scores + narrative])
-
-    classDef llm fill:#e8f4fc,stroke:#007AA7,color:#003366
-    classDef det fill:#eef7ee,stroke:#2d6a2d,color:#1a3d1a
-    classDef route fill:#fff3e0,stroke:#e65100,color:#bf360c
-    classDef terminal fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
-
-    class parse_query,generate_narrative llm
-    class compute_baseline,run_scenario det
-    class route_after_parse,route_after_access route
-    class END_FAIL,END_DENY,END_OK terminal
-```
-
-## `PipelineState` (graph state)
-
-| Field | Set by | Purpose |
-|---|---|---|
-| `question` | input | Raw NL question |
-| `role` | input | Access control role |
-| `audience` | input | `analyst` or `executive` narrative |
-| `indicator_scores` | input | DataFrame or `list[dict]` for checkpointer |
-| `query` | `parse_query` | Validated `ScenarioQuery` |
-| `parse_failure` | `parse_query` | Fail-closed parse/guardrail result |
-| `access_denied` | `check_access` | Role not allowed for segment |
-| `baseline` | `compute_baseline` | Deterministic driver baseline |
-| `scenario` | `run_scenario` | Disruptor-adjusted scenario output |
-| `narrative` | `generate_narrative` | Final LLM narrative |
-
-## Routing functions
-
-```python
-# route_after_parse — after parse_query
-parse_failure?  → "clarify"  → END
-else            → "check_access"
-
-# route_after_access — after check_access
-access_denied?  → "denied"           → END
-else            → "compute_baseline"
-```
-
-## Optional: persistent memory (`demo.py --thread`)
-
-When `build_graph(checkpointer=SqliteSaver(...))` is used, LangGraph persists
-`PipelineState` between invocations on the same `thread_id`. On a follow-up
-call, `indicator_scores` may be reused from checkpoint (see `demo.py`).
-
-## Not in the compiled query graph
-
-`node_request_overlay_confirmation` is **defined** in `graph.py` (LangGraph
-`interrupt()` for human overlay confirmation) but **not wired** into
-`build_graph()` today. The overlay path runs separately via
-`demo.py overlay` → `overlay_extractor.py` + `guardrails/gates.py`.
-
-```mermaid
-flowchart LR
-    subgraph overlay["demo.py overlay (separate from query graph)"]
-        SEARCH[Tavily / MCP / bundled] --> EXTRACT[extract_overlay_event LLM]
-        EXTRACT --> STAGE[stage_overlay_event STAGED]
-        STAGE --> CONFIRM[confirm_overlay_event]
-        CONFIRM -->|second confirm| REJECT[invalid_transition guardrail]
-    end
-```
-
-## Phoenix
-
-With `OBSERVABILITY_BACKEND=phoenix`, each LangGraph node appears as a span
-in the Phoenix UI when running `demo.py query`. LLM spans nest under
-`parse_query` and `generate_narrative`.
-
-
-#####################
-
+rationale, pressure-test findings, and the STAR interview narrative live in
+`fde-interview-narrative.docx` — this README covers the code: what's real,
+what's synthetic, what needs API keys, and how to run demos, observability,
+guardrails, and evals.
 
 ## Quick start
 
 ```bash
-python -m venv venv && source venv/bin/activate
+# Prefer conda env used for this POC (Windows):
+#   conda activate projpro
+python -m venv venv && source venv/bin/activate   # or Windows venv equivalent
 pip install -r requirements.txt
 
-# Works immediately, no API key needed — deterministic core + graph control
-# flow with mocked LLM steps, clearly labeled as such in the output:
+# Works immediately, no API key — deterministic core + mocked LLM steps:
 python demo.py "How exposed is Optum Health to a Medicare Advantage rate cut this year?"
 
-# Run the test suite (21 tests, no API key needed — see "What's testable
-# without API keys" below):
+# Unit + offline eval gates (no API key):
 PYTHONPATH=. pytest tests/ -v
+python -m evals
 
-# For a real end-to-end run with live LLM calls:
-cp .env.example .env   # then fill in OPENAI_API_KEY
-python demo.py "How exposed is Optum Insight to a cyber disruptor?"
-# demo.py auto-loads .env from the repo root (no manual export needed)
+# Live end-to-end (needs OPENAI_API_KEY):
+cp .env.example .env   # fill OPENAI_API_KEY, models, observability
+python demo.py query "How exposed is Optum Insight to a cyber disruptor?"
+# demo.py / evals auto-load .env from the repo root
 ```
 
 ## Data provenance — read this before presenting any output as real
@@ -153,112 +42,186 @@ python demo.py "How exposed is Optum Insight to a cyber disruptor?"
 to run this project.** Nothing here should be presented as reflecting real
 UHG internal methodology or data access.
 
+## Architecture (short)
+
+```text
+demo.py
+  ├─ query  → LangGraph: parse → access → baseline → scenario → narrative
+  ├─ overlay → search (optional) → extract → stage → human confirm
+  └─ tool   → optional MCP (non-authoritative)
+
+src/quant_core + scenario   → deterministic baseline risk/opportunity
+src/ai_steps                → three narrow LLM steps (Instructor)
+src/guardrails              → scope, access, confidence floor, overlay staging
+src/observability           → Phoenix (default) or LangSmith or none
+evals/                      → offline / live / judge / Phoenix path + annotations
+```
+
+See [docs/project_flow.md](docs/project_flow.md) and [docs/langgraph_flow.md](docs/langgraph_flow.md).
+
 ## What's testable without API keys (and what isn't)
 
 The deterministic quant core, scenario engine, and guardrail logic are pure
-Python with no network dependency — `pytest tests/` runs all 21 tests with
-zero setup and they genuinely exercise the harmonization transforms, the
-low-N weighting fallback, the confidence-floor guardrail, and the graph's
-fail-closed routing.
+Python with no network dependency — `pytest tests/` exercises harmonization,
+low-N weighting fallback, confidence-floor behavior, and fail-closed graph
+routing. Offline eval suites run with `python -m evals` (fixtures only).
 
-The three LLM steps (`src/ai_steps/`) need a real `OPENAI_API_KEY` to make
-an actual model call — that part is not testable in an offline sandbox. What
-*is* tested without a key is the guardrail logic that **wraps** those calls
-(`tests/test_narrative_guardrail.py` mocks the model client and proves the
-confidence-caveat guardrail holds even when the model tries to editorialize
-about its own confidence) and the graph's control flow around them
-(`tests/test_graph_mocked.py`).
+The three LLM steps (`src/ai_steps/`) need `OPENAI_API_KEY` for live calls.
+Without a key, guardrails that **wrap** those calls are still tested
+(`tests/test_narrative_guardrail.py`, `tests/test_graph_mocked.py`).
 
-Three real bugs were caught and fixed during this build, in case it comes up:
-1. The retired-segment guardrail check didn't match on `"Optum International"`
-   (space) vs. its alias `"Optum_International"` (underscore) — fixed in
-   `guardrails/gates.py`.
-2. `demo.py`'s no-API-key path mocked the query parser but not the narrative
-   generator, so it still crashed looking for `OPENAI_API_KEY` — fixed by
-   mocking both LLM steps in that code path.
-3. `demo.py`'s synthetic indicator data only covered the three indicators
-   used in the first scenario tested (Capital), so querying a Data_Digital
-   driver found no data at all — fixed by generating scores across every
-   registered indicator, not a hand-picked subset.
+Bugs caught during the build (examples):
+1. Retired-segment alias matching (`Optum International` vs `Optum_International`) — `guardrails/gates.py`
+2. No-API demo path mocked parser but not narrative — fixed in `demo.py`
+3. Synthetic indicators only covered Capital — expanded across the registry
 
 ## Model tiers
 
 | Step | Model | Why |
 |---|---|---|
 | Query parsing | `FAST_MODEL` (default `gpt-4o-mini`) | Low-ambiguity structured extraction |
-| Narrative generation | `FAST_MODEL` | Templating/rewriting, not judgment |
-| Overlay extraction | `STRONG_MODEL` (default `gpt-4o`) | Genuine judgment call (severity/immediacy/persistence ratings); paired with a mandatory human-confirmation gate regardless of model strength |
+| Narrative generation | `FAST_MODEL` | Templating/rewriting; caveat enforced in code |
+| Overlay extraction | `STRONG_MODEL` (default `gpt-4o`) | Severity/immediacy/persistence judgment + mandatory human confirm |
+| Eval LLM-as-judge / phoenix.evals | `JUDGE_MODEL` (default `gpt-4.1-mini`) | Dedicated grader, separate from production extractor |
 
 Override via `.env` — see `.env.example`.
 
+## Guardrails
+
+Product gates in `src/guardrails/gates.py` (not prompt-only):
+
+| Gate | Behavior |
+|---|---|
+| **UHG scope** | Off-topic questions rejected (`out_of_scope`) |
+| **Retired segments** | Aliases like Optum International → `unknown_segment` (fail closed) |
+| **Access control** | Role × segment (`guest` / analyst / executive / admin) |
+| **Confidence floor** | `CONFIDENCE_FLOOR = 0.5` — no pathway if below floor |
+| **Narrative caveat** | Low-confidence caveat **appended in code** after the LLM call |
+| **Overlay staging** | Every extract enters `staged`; only `confirm_overlay_event` promotes to `confirmed` |
+
+Evals that cover these: offline `scope_gate`, `narrative_caveat_guardrail`, watch paths
+`guardrail_clarify` / `access_denied`, plus narrative caveat span checks.
+Full mapping: [evals/README.md](evals/README.md#guardrails-product--evals-coverage).
+
+## Observability
+
+Pick **one** backend (do not run Phoenix and LangSmith together for the POC):
+
+| Backend | When |
+|---|---|
+| **Phoenix** (`OBSERVABILITY_BACKEND=phoenix`) | Local, open source; default for this repo |
+| **LangSmith** | Hosted; needs `LANGSMITH_API_KEY` |
+| **none** | Offline/tests |
+
+### Phoenix setup
+
+```env
+OBSERVABILITY_BACKEND=phoenix
+PHOENIX_PROJECT=uhg-risk-intelligence
+PHOENIX_COLLECTOR_ENDPOINT=http://127.0.0.1:6006/v1/traces
+```
+
+```powershell
+phoenix serve   # UI http://127.0.0.1:6006
+```
+
+- Spans export via `src/observability.py` (OTLP).
+- Local store defaults to `~/.phoenix/phoenix.db` (WAL files while running).
+- **Select project `uhg-risk-intelligence` in the UI** — not `default`.
+- MCP calls emit `mcp.call_tool` / `mcp.list_tools`; overlay `--live-search` emits `tavily.search` (RETRIEVER).
+
+`demo.py` only **exports** traces. Eval **annotations** require `python -m evals ... --annotate`.
+
+| UI location | Use |
+|---|---|
+| Traces → span → **Annotations** | `eval.*` (CODE), `phoenix_eval.*` / judges (LLM) |
+| **Evaluators** page (“connect database”) | Not used by this repo for local serve |
+
+## Evals
+
+Harness: [evals/README.md](evals/README.md). Deeper docs under `docs/evals_*.md`.
+
+```powershell
+python -m evals                         # offline fixtures + sample spans
+python -m evals --live-only             # parser + overlay + all judges (OpenAI)
+python -m evals --judges-only           # LLM-as-judge fixtures only
+python -m evals --phoenix-only --annotate
+python -m evals --phoenix-only --phoenix-evals --annotate
+python -m evals --watch --interval 10 --phoenix-evals --annotate
+python -m evals --watch --judge --phoenix-evals --annotate
+python -m evals --all --annotate --json-out evals/last_report.json
+
+pytest tests/test_evals_offline.py tests/test_llm_judge_rules.py `
+  tests/test_phoenix_evals_dataframe.py tests/test_run_path_classifier.py
+```
+
+| Layer | Examples |
+|---|---|
+| Offline | Scope gate, parser smoke, overlay ±1, narrative faithfulness/caveat, retrieval keywords, backtest anchors, sample Phoenix spans |
+| Live fixtures | Real `parse_query` (exact + Jaccard drivers), live overlay double-rate |
+| Custom judges | Narrative faithfulness/style, retrieval relevance, overlay calibration (`JUDGE_MODEL`) |
+| Phoenix path | Per-run `full_success` / `overlay_success` / `guardrail_clarify` / `mcp_tool` / … |
+| Phoenix-native | Arize `phoenix.evals` classifiers on latest-run payloads (`--phoenix-evals`) |
+
+**Continuous demo loop:** Terminal A `phoenix serve` · Terminal B `python -m evals --watch --phoenix-evals --annotate` · Terminal C `demo.py query|overlay|tool …`
+
+CLI markers: `(ok)` pass · `(X)` fail · `(-)` skipped N/A.
+
 ## Optional MCP tools (supplemental data)
 
-The main pipeline is unchanged. MCP is an **optional extra** the same CLI can
-call for non-authoritative context (market data, backtest anchors, search).
+Non-authoritative context only; main pipeline unchanged.
 
 ```bash
-# Built-in local server is always configured (no extra setup):
 python demo.py tool list
 python demo.py tool call local.list_schema
 python demo.py tool call local.get_backtest_anchors
 python demo.py tool call yfmcp.yfinance_get_ticker_info --symbol UNH
-python demo.py tool call yfmcp.yfinance_get_ticker_info --symbol UNH --audience executive
-python demo.py tool call local.get_backtest_anchors --raw   # full JSON if needed
-
-# After a successful query run, append supplemental MCP context:
 python demo.py query "How exposed is Optum Insight to cyber risk?" --mcp-context
-
-# Overlay path: try MCP search tools first, then Tavily/bundled fallback:
-python demo.py overlay --segment Optum_Insight --driver Cyber --mcp-search
+python demo.py overlay --segment Optum_Insight --driver Data_Digital --mcp-search
 ```
 
-Enable with `MCP_ENABLED=true` (default). Copy `mcp_servers.json.example` to
-`mcp_servers.json` to add optional servers such as `yfmcp` for UNH ticker
-context via `uvx yfmcp`.
+`MCP_ENABLED=true` by default. Copy `mcp_servers.json.example` → `mcp_servers.json` for optional servers (e.g. `yfmcp` via `uvx yfmcp`).
 
-With `OBSERVABILITY_BACKEND=phoenix`, spans export to the project named in
-`PHOENIX_PROJECT` (default `uhg-risk-intelligence`). **Select that project**
-in the Phoenix UI — traces do not appear if you are viewing `default` only.
-MCP `tool list` / `tool call` emit spans (`mcp.call_tool`, `mcp.list_tools`).
-Overlay live search (`--live-search`) emits a **`tavily.search`** span
-(kind: RETRIEVER) with query, source URL, and content preview.
+## Demo CLI (common)
 
-## Evals and observability
-
-Two options, deliberately not both wired up by default (pick one rather than
-running two observability stacks for a proof of concept):
-
-- **LangSmith** (`LANGSMITH_API_KEY` in `.env`) — free tier, integrates
-  natively with LangGraph since that's already the orchestration layer, gets
-  you tracing and eval datasets with the least setup.
-- **Arize Phoenix** — fully open source, self-hosted, no account or API key
-  needed at all (`pip install arize-phoenix`, run locally). Better fit if
-  you want a "no external dependency" story.
-
-Eval sets to build (not yet populated ):
-- Query-parser accuracy: labeled NL questions → expected `ScenarioQuery`
-- Overlay-extraction calibration: double-rated ground truth (two independent
-  raters per event — single-label grading is too strict for an inherently
-  subjective 0-3 scale, per the pressure-test finding in the narrative doc)
-- Core validation backtest: driver baselines vs. the two real anchor events
-  in `data/backtest_anchors.json`
+```bash
+python demo.py query "How exposed is Optum Health to a Medicare Advantage rate cut this year?" --role analyst --audience analyst
+python demo.py query "How is NVIDIA stock doing?" --role guest          # expect clarify / out_of_scope
+python demo.py overlay --segment Optum_Insight --driver Data_Digital --live-search
+python demo.py tool call local.get_backtest_anchors
+```
 
 ## Project layout
 
 ```
 src/
-  schemas.py              # every data contract — read this first
-  quant_core/              # deterministic, no LLM — ontology, harmonize, weight, baseline
-  scenario/engine.py       # disruptor x sector x segment, healthcare-specific pathways
-  guardrails/gates.py      # confidence floor, overlay staging, access control
-  ai_steps/                 # the three narrow LLM steps + search tool
-  data/                     # real backtest anchors + synthetic registry/samples
-  graph.py                  # LangGraph wiring — orchestration only, no agentic reasoning
-tests/                      # 21 tests, all runnable without API keys
-demo.py                     # CLI entry point, runs with or without a live API key
+  schemas.py                 # data contracts — read first
+  quant_core/                # deterministic ontology, harmonize, weight, baseline
+  scenario/engine.py         # disruptor × sector × segment, pathways
+  guardrails/gates.py        # scope, access, confidence floor, overlay stage/confirm
+  ai_steps/                  # query_parser, narrative_generator, overlay_extractor, search
+  observability.py           # phoenix | langsmith | none
+  data/                      # backtest anchors + synthetic samples
+  graph.py                   # LangGraph orchestration only
+tests/                       # unit tests + offline gates (no API key)
+evals/                       # fixtures, scorers, judges, phoenix_evals, watch, runner
+  README.md                  # full evals + observability + guardrail coverage map
+demo.py                      # CLI entry (query | overlay | tool)
 docs/
-  langgraph_flow.md         # LangGraph node/edge diagram from src/graph.py
-  project_flow.md           # Full project flow (CLI, overlay, MCP, observability)
+  langgraph_flow.md
+  project_flow.md
+  evals_live.md
+  evals_llm_judge.md
+  evals_phoenix_native.md
+  emerging_events_rag_design.md   # design-only RAG for S&P/IMD + emerging events
 ```
 
+## Design notes (not implemented)
 
+[docs/emerging_events_rag_design.md](docs/emerging_events_rag_design.md) — plan for storing emerging news/reports in a RAG store between S&P/IMD score cycles, hybrid retrieval, and metrics (nDCG, faithfulness, etc.). Illustrative samples only.
+
+## Known limitations
+
+See `fde-interview-narrative.docx` Section 6 for the full list (data sourcing,
+low-N weighting, Community & State scoping, etc.). This code implements that
+section's design decisions rather than restating them here.
